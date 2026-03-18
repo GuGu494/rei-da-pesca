@@ -1,0 +1,67 @@
+.servicos-section {
+  background-color: #fdf7ec; /* Cor bege de fundo (ajuste se tiver o Hex exato do Figma) */
+  padding: 80px 50px;
+}
+
+.servicos-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.servicos-header h2 {
+  color: #315131; /* Verde escuro do design */
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  font-family: 'Times New Roman', serif;
+}
+
+.servicos-header p {
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px; /* Espaço entre os cartões */
+  max-width: 1200px;
+  margin: 0 auto; /* Centraliza o bloco de cartões na tela */
+}
+
+.card {
+  background-color: #f2ebe6; /* Cor de fundo do cartão */
+  border-radius: 15px; /* Bordas arredondadas */
+  width: 32%; /* Cada cartão ocupa cerca de 1/3 do espaço */
+  overflow: hidden; /* Corta a ponta quadrada da imagem para ficar redonda */
+}
+
+.card img {
+  width: 100%;
+  height: 200px; /* Fixamos a altura para todas as imagens ficarem iguais */
+  object-fit: cover; /* Garante que a imagem não amasse */
+}
+
+.card-content {
+  padding: 30px;
+}
+
+.card-content h3 {
+  color: #315131;
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+  font-family: 'Times New Roman', serif;
+}
+
+.card-content p {
+  color: #4a4a4a;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.card-content ul {
+  padding-left: 20px;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}

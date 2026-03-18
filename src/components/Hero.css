@@ -1,0 +1,41 @@
+.hero-container {
+  /* Substitua pelo caminho da sua imagem do Figma */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 80vh; /* Ocupa 80% da altura da tela */
+  display: flex;
+  align-items: center; /* Centraliza o conteúdo verticalmente */
+  padding: 0 50px; /* Mesmo alinhamento do Header */
+}
+
+/* O linear-gradient acima adiciona uma camada escura sobre a imagem 
+   para o texto branco ficar legível, igualzinho no seu design! */
+
+.hero-content {
+  max-width: 600px; /* Limita a largura para o texto quebrar a linha como no design */
+  color: white;
+}
+
+.hero-content h1 {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  font-family: 'Times New Roman', serif; /* Ou a fonte com serifa que usou no Figma */
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.btn-reserva {
+  background-color: #3a5c3a;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+}

@@ -1,0 +1,42 @@
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Reduzimos o padding vertical de 20px para 15px (ou até 10px se quiser menor) */
+  padding: 15px 50px; 
+  background-color: #ffffff;
+  /* Vamos garantir que o header ocupe no máximo uns 10% a 15% da tela */
+  height: 15vh; 
+}
+
+.logo img {
+  height: 60px; /* Vá mudando esse número (50px, 70px...) até ficar igual ao Figma */
+  width: auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: 40px; /* Espaço entre os links */
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #1a1a1a;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.btn-whatsapp {
+  background-color: #315131; /* Cor verde parecida com o seu design */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.btn-whatsapp:hover {
+  opacity: 0.8;
+}
