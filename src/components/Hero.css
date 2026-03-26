@@ -1,12 +1,16 @@
 .hero-container {
-  /* Substitua pelo caminho da sua imagem do Figma */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/background.jpg');
+  /* --- MUDANÇAS AQUI --- */
+  background-image: url('../assets/background.jpg'); /* Sem o gradiente escuro */
   background-size: cover;
   background-position: center;
-  height: 80vh; /* Ocupa 80% da altura da tela */
+  height: 100vh; /* Ocupa a tela inteira, para o efeito de vidro funcionar bem */
+  /* ---------------------- */
   display: flex;
-  align-items: center; /* Centraliza o conteúdo verticalmente */
-  padding: 0 50px; /* Mesmo alinhamento do Header */
+  align-items: center;
+  padding: 0 50px;
+  /* --- MUDANÇAS AQUI --- */
+  padding-top: 15vh; /* Dá espaço para o cabeçalho posicionado de forma absoluta */
+  /* ---------------------- */
 }
 
 /* O linear-gradient acima adiciona uma camada escura sobre a imagem 

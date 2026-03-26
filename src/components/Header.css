@@ -2,41 +2,81 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Reduzimos o padding vertical de 20px para 15px (ou até 10px se quiser menor) */
-  padding: 15px 50px; 
-  background-color: #ffffff;
-  /* Vamos garantir que o header ocupe no máximo uns 10% a 15% da tela */
-  height: 15vh; 
+  padding: 15px 50px;
+  /* --- MUDANÇAS AQUI --- */
+  position: absolute; /* Coloca o cabeçalho no topo, sobre o Hero */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100; /* Garante que fique acima de tudo */
+  background: rgba(255, 255, 255, 0.05); /* Um toque de branco translúcido */
+  backdrop-filter: blur(15px); /* O efeito de desfoque de vidro */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave para destacar */
+  /* ---------------------- */
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espaço entre o desenho do peixe e o texto */
 }
 
 .logo img {
-  height: 60px; /* Vá mudando esse número (50px, 70px...) até ficar igual ao Figma */
+  height: 50px;
   width: auto;
+  border-radius: 8px; /* Arredonda as pontas do fundo branco para ficar mais suave */
 }
 
+.logo-text {
+  color: #FFFFFF; /* Texto branco */
+  font-size: 1.8rem;
+  font-weight: bold;
+  font-family: 'Times New Roman', Times, serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Sombra para leitura */
+}
+
+/* --- Arrumando os Links do Menu --- */
 .nav-links {
   display: flex;
-  gap: 40px; /* Espaço entre os links */
+  gap: 60px; 
 }
 
 .nav-links a {
   text-decoration: none;
-  color: #1a1a1a;
-  font-weight: 500;
+  color: #FFFFFF; /* Mudamos para BRANCO para dar contraste com as árvores */
+  font-weight: 600;
   font-size: 1.1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombrinha para o texto não sumir nas folhas */
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #dcd3cb; /* Fica levemente bege ao passar o mouse */
 }
 
 .btn-whatsapp {
-  background-color: #315131; /* Cor verde parecida com o seu design */
+  background-color: #315131; /* Cor verde do seu design */
   color: white;
-  border: none;
+  text-decoration: none; /* Tira o sublinhado do link <a> */
   padding: 12px 24px;
   border-radius: 50px;
   font-weight: bold;
-  cursor: pointer;
+  font-size: 0.9rem;
+  
+  /* MÁGICA DO ALINHAMENTO: Coloca ícone e texto lado a lado */
+  display: flex;
+  align-items: center; 
+  gap: 10px; /* Espaço de 10px entre o ícone e o texto */
+  
   transition: opacity 0.3s ease;
+  cursor: pointer;
 }
 
 .btn-whatsapp:hover {
-  opacity: 0.8;
+  opacity: 0.9;
+}
+
+/* Tamanho do ícone do WhatsApp */
+.whatsapp-icon {
+  font-size: 1.3rem; /* Ajuste o tamanho aqui se quiser maior ou menor */
 }

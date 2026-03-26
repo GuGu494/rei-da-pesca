@@ -1,14 +1,18 @@
 import React from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import Servicos from './components/Servicos'; // Importe aqui!
+import Servicos from './components/Servicos';
+import Eventos from './components/Eventos'; 
+import Localizacao from './components/Localizacao';
 
 function App() {
   return (
     <div>
       <Header />
       <Hero />
-      <Servicos /> {/* Coloque a tag aqui! */}
+      <Servicos />
+      <Eventos /> 
+      <Localizacao /> 
     </div>
   );
 }

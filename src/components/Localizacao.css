@@ -1,0 +1,103 @@
+.localizacao-section {
+  background-color: #2E4C2D; /* Fundo verde escuro do design */
+  color: #FFFFFF;
+  padding: 80px 50px 30px; /* Mais espaço em cima, menos embaixo perto dos direitos autorais */
+}
+
+.localizacao-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Divide em 2 colunas iguais */
+  gap: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-bottom: 60px;
+}
+
+/* --- Lado Esquerdo (Informações) --- */
+.info-col h2 {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.info-item {
+  display: flex;
+  gap: 15px; /* Espaço entre o ícone e o texto */
+  margin-bottom: 25px;
+  align-items: flex-start;
+}
+
+.info-icon {
+  font-size: 1.5rem;
+  margin-top: 2px;
+}
+
+.info-item strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.info-item p {
+  margin: 0;
+  line-height: 1.4;
+  color: #E2E8E2; /* Um branco levemente acinzentado para o texto secundário */
+}
+
+.horario-funcionamento {
+  margin-top: 40px;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.horario-funcionamento strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.link-admin {
+  color: #E2E8E2;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.link-admin:hover {
+  opacity: 0.7;
+}
+
+/* --- Lado Direito (Mapa) --- */
+.map-col h3 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.map-container {
+  width: 100%;
+  height: 350px;
+  border-radius: 15px; /* Arredonda as pontas do mapa */
+  overflow: hidden; /* Corta o mapa para respeitar as pontas arredondadas */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* --- Rodapé Final --- */
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* A linha divisória clarinha */
+}
+
+.footer-bottom p {
+  color: #E2E8E2;
+  font-size: 0.9rem;
+}
+
+/* --- Responsividade (Celular) --- */
+@media (max-width: 768px) {
+  .localizacao-grid {
+    grid-template-columns: 1fr; /* Fica tudo em 1 coluna só no celular */
+    gap: 40px;
+  }
+}

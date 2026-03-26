@@ -9,6 +9,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden; /* Evita que o site crie uma barra de rolagem para os lados */
+  scroll-behavior: smooth;
 }
 
 /* O SEGREDO ESTÁ AQUI: Zerando os limites da caixa do React */
