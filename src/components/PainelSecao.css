@@ -1,0 +1,196 @@
+/* PainelSecao.css — CSS compartilhado para Vendas, Gastos, Reservas e Estoque */
+ 
+.secao-card {
+  background: #f5f0e8;
+  border-radius: 16px;
+  padding: 32px 36px;
+  width: 100%;
+  box-sizing: border-box;
+}
+ 
+/* Título com ícone de peixe */
+.secao-titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+ 
+.secao-titulo h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+ 
+/* Grid de formulário 2 colunas */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+ 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+ 
+.form-group.span-full {
+  grid-column: 1 / -1;
+}
+ 
+.form-group label {
+  font-size: 0.82rem;
+  color: #555;
+  font-weight: 500;
+}
+ 
+.form-group input,
+.form-group select {
+  padding: 11px 14px;
+  border: 1.5px solid #e0d8cc;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: #333;
+  background: #fdf8f0;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+ 
+.form-group input:focus {
+  border-color: #2d6a2d;
+  background: #fff;
+}
+ 
+/* Input com ícone de calendário */
+.input-icon-wrap {
+  position: relative;
+}
+ 
+.input-icon-wrap input {
+  width: 100%;
+  padding-right: 36px;
+}
+ 
+.campo-icone {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.5;
+}
+ 
+/* Botão Adicionar */
+.btn-adicionar {
+  width: 100%;
+  padding: 13px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 28px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+ 
+.btn-adicionar:active {
+  transform: scale(0.98);
+}
+ 
+.btn-adicionar.verde {
+  background-color: #2d6a2d;
+  color: #fff;
+}
+ 
+.btn-adicionar.verde:hover {
+  background-color: #245224;
+}
+ 
+.btn-adicionar.vermelho {
+  background-color: #c0392b;
+  color: #fff;
+}
+ 
+.btn-adicionar.vermelho:hover {
+  background-color: #a93226;
+}
+ 
+/* Botão de filtro (menor largura) */
+.btn-filtro {
+  width: auto;
+  min-width: 180px;
+  padding: 11px 32px;
+}
+ 
+/* Título da tabela */
+.tabela-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 14px;
+}
+ 
+/* Tabela */
+.painel-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  table-layout: fixed;
+}
+ 
+.painel-tabela thead tr {
+  border-bottom: 2px solid #ddd;
+}
+ 
+.painel-tabela th {
+  text-align: center;
+  padding: 10px 14px;
+  color: #888;
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+ 
+.painel-tabela td {
+  padding: 14px;
+  color: #333;
+  border-bottom: 1.5px dashed #ddd;
+  text-align: center;
+}
+ 
+.painel-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+ 
+.painel-tabela tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+ 
+/* Status badges (Reservas) */
+.status-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+ 
+.status-verde    { background: #e8f5e9; color: #2d6a2d; }
+.status-amarelo  { background: #fff8e1; color: #856404; }
+.status-vermelho { background: #fdecea; color: #c0392b; }
+ 
+/* Responsivo */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .secao-card {
+    padding: 20px 16px;
+  }
+}

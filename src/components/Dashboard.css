@@ -1,0 +1,366 @@
+/* Dashboard.css */
+ 
+* {
+  box-sizing: border-box;
+}
+ 
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f8;
+}
+ 
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 200px;
+  background: #fff;
+  border-right: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+}
+ 
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a1a2e;
+}
+ 
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  gap: 2px;
+}
+ 
+.nav-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 11px 20px;
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+ 
+.nav-item:hover {
+  background: #f5f5f5;
+  color: #1a1a2e;
+}
+ 
+.nav-item.ativo {
+  background: #2d6a2d;
+  color: #fff;
+  font-weight: 600;
+}
+ 
+.sair-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 12px 20px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+ 
+.sair-btn:hover {
+  background: #fdf0ef;
+}
+ 
+/* ===== CONTEÚDO PRINCIPAL ===== */
+.main-content {
+  margin-left: 200px;
+  flex: 1;
+  padding: 28px 32px;
+}
+ 
+.painel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+ 
+.painel-header h1 {
+  font-size: 1.5rem;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+ 
+.painel-header p {
+  color: #888;
+  font-size: 0.88rem;
+  margin: 0;
+}
+ 
+.periodo-btns {
+  display: flex;
+  gap: 4px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 4px;
+}
+ 
+.periodo-btn {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #666;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+ 
+.periodo-btn.ativo,
+.periodo-btn:hover {
+  background: #fff;
+  color: #1a1a2e;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+ 
+.voltar-site-dash {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+ 
+.voltar-site-dash:hover {
+  color: #2d6a2d;
+}
+ 
+/* ===== CARDS ===== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+ 
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+ 
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+ 
+.card-icon.verde   { background: #e8f5e9; color: #2d6a2d; }
+.card-icon.vermelho { background: #fdecea; color: #c0392b; }
+.card-icon.azul    { background: #e8f0fe; color: #2563eb; }
+.card-icon.amarelo { background: #fff8e1; color: #f59e0b; }
+ 
+.card-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+ 
+.card-valor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+ 
+.card-variacao {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+ 
+.card-variacao.positivo { color: #2d6a2d; }
+.card-variacao.negativo { color: #c0392b; }
+ 
+.card-sub {
+  font-size: 0.78rem;
+  color: #aaa;
+}
+ 
+/* ===== BOTTOM GRID ===== */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+}
+ 
+/* Gráfico */
+.grafico-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+ 
+.grafico-header strong {
+  font-size: 0.95rem;
+  color: #1a1a2e;
+}
+ 
+.grafico-header p {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin: 2px 0 20px;
+}
+ 
+.barras {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  gap: 8px;
+}
+ 
+.barra-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+ 
+.barra-valor {
+  font-size: 0.7rem;
+  color: #aaa;
+}
+ 
+.barra {
+  width: 100%;
+  background: #2d6a2d;
+  border-radius: 4px 4px 0 0;
+  min-height: 8px;
+  transition: height 0.3s;
+}
+ 
+.barra-dia {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 4px;
+}
+ 
+/* Resumo do Dia */
+.resumo-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+ 
+.resumo-titulo {
+  font-size: 0.9rem;
+  color: #1a1a2e;
+}
+ 
+.resumo-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+ 
+.resumo-item > span:first-child {
+  font-size: 0.78rem;
+  color: #888;
+  display: flex;
+  justify-content: space-between;
+}
+ 
+.resumo-item > span:last-of-type {
+  font-size: 0.78rem;
+  color: #555;
+  text-align: right;
+}
+ 
+.barra-prog {
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+ 
+.barra-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+ 
+.barra-fill.verde   { background: #2d6a2d; }
+.barra-fill.azul    { background: #2563eb; }
+.barra-fill.vermelho { background: #e74c3c; }
+ 
+.aviso {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+ 
+.aviso-amarelo { background: #fff8e1; color: #856404; }
+.aviso-azul    { background: #e8f0fe; color: #1d4ed8; }
+ 
+/* ===== RESPONSIVO ===== */
+@media (max-width: 900px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+ 
+@media (max-width: 600px) {
+  .sidebar {
+    width: 60px;
+  }
+  .sidebar-logo span,
+  .nav-item {
+    display: none;
+  }
+  .main-content {
+    margin-left: 60px;
+    padding: 16px;
+  }
+}

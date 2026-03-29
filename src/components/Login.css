@@ -1,0 +1,147 @@
+/* Login.css */
+ 
+.login-page {
+  min-height: 100vh;
+  background-color: #f5f0e8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: 'Segoe UI', sans-serif;
+}
+ 
+.login-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+ 
+.login-logo h1 {
+  font-size: 1.6rem;
+  color: #1a1a2e;
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+ 
+.login-logo p {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+ 
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+ 
+.login-card h2 {
+  font-size: 1.4rem;
+  color: #1a1a2e;
+  margin: 0 0 28px;
+  font-weight: 700;
+}
+ 
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+ 
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+ 
+.login-field label {
+  font-size: 0.88rem;
+  color: #444;
+  font-weight: 500;
+}
+ 
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+ 
+.input-icon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+ 
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 14px 12px 38px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+ 
+.input-wrapper input:focus {
+  border-color: #2d6a2d;
+  background: #fff;
+}
+ 
+.input-wrapper input::placeholder {
+  color: #bbb;
+}
+ 
+.login-erro {
+  color: #c0392b;
+  font-size: 0.85rem;
+  margin: -6px 0 0;
+  background: #fdf0ef;
+  border: 1px solid #f5c6c2;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+ 
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background-color: #2d6a2d;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+ 
+.login-btn:hover {
+  background-color: #245224;
+}
+ 
+.login-btn:active {
+  transform: scale(0.98);
+}
+ 
+.voltar-site {
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+ 
+.voltar-site:hover {
+  color: #2d6a2d;
+}
