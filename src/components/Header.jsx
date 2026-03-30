@@ -1,15 +1,16 @@
 import React from 'react';
 import './Header.css';
-import logo from '../assets/logo.jpg'; 
-
-// 1. IMPORTANTE: Importamos o ícone aqui
 import { FaWhatsapp } from 'react-icons/fa';
 
 function Header() {
   return (
     <header className="header-container">
       <div className="logo">
-        <img src={logo} alt="Rei da Pesca" />
+        <svg width="60" height="40" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M70 25 C55 10, 20 5, 5 25 C20 45, 55 40, 70 25Z" stroke="#2d6a2d" strokeWidth="3" fill="none"/>
+          <path d="M70 25 L80 15 M70 25 L80 35" stroke="#2d6a2d" strokeWidth="3" strokeLinecap="round"/>
+          <circle cx="18" cy="22" r="2.5" fill="#2d6a2d"/>
+        </svg>
         <span className="logo-text">Rei da Pesca</span>
       </div>
       
