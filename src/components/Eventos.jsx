@@ -47,7 +47,7 @@ function Eventos() {
 
             {/* Linha 4 (Ocupa as duas colunas) */}
             <div className="input-group full-width">
-              <label>Observações *</label>
+              <label>Observações </label>
               <textarea placeholder="Detalhes do evento" rows="4" required></textarea>
             </div>
           </div>
