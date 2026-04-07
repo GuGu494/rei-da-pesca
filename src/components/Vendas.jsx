@@ -1,31 +1,47 @@
 import React, { useState } from 'react';
 import './PainelSecao.css';
- 
+
 const vendasIniciais = [
-  { id: 1, data: '15/03/2026', servico: 'Equipamento', descricao: 'Aluguel de vara', valor: 500 },
-  { id: 2, data: '16/03/2026', servico: 'Isca',        descricao: 'Minhoca e iscas', valor: 300 },
-  { id: 3, data: '17/03/2026', servico: 'Evento',      descricao: 'Festa privada',   valor: 400 },
+  { id: 1, data: '15/03/2026', servico: 'Equipamento', descricao: 'Aluguel de vara', valor: 500, pessoas: 2 },
+  { id: 2, data: '16/03/2026', servico: 'Isca',        descricao: 'Minhoca e iscas', valor: 300, pessoas: 1 },
+  { id: 3, data: '17/03/2026', servico: 'Evento',      descricao: 'Festa privada',   valor: 400, pessoas: 10 },
 ];
- 
+
 function Vendas() {
   const [vendas, setVendas] = useState(vendasIniciais);
-  const [form, setForm] = useState({ data: '', servico: '', valor: '', descricao: '' });
- 
+  const [form, setForm] = useState({ 
+    data: '', 
+    servico: '', 
+    valor: '', 
+    descricao: '',
+    pessoas: '' // NOVO
+  });
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
- 
+
   const handleAdicionar = () => {
-    if (!form.data || !form.servico || !form.valor) return;
+    if (!form.data || !form.servico || !form.valor || !form.pessoas) return;
+
     const nova = {
       id: vendas.length + 1,
       data: form.data,
       servico: form.servico,
       descricao: form.descricao,
       valor: parseFloat(form.valor),
+      pessoas: parseInt(form.pessoas) // NOVO
     };
+
     setVendas([...vendas, nova]);
-    setForm({ data: '', servico: '', valor: '', descricao: '' });
+
+    setForm({ 
+      data: '', 
+      servico: '', 
+      valor: '', 
+      descricao: '',
+      pessoas: ''
+    });
   };
- 
+
   return (
     <div className="secao-card">
       {/* Cabeçalho */}
@@ -37,7 +53,7 @@ function Vendas() {
         </svg>
         <h2>Lançamento de Vendas</h2>
       </div>
- 
+
       {/* Formulário */}
       <div className="form-grid">
         <div className="form-group">
@@ -47,31 +63,42 @@ function Vendas() {
             <span className="campo-icone">📅</span>
           </div>
         </div>
- 
+
         <div className="form-group">
           <label>Serviço</label>
-          <input type="text" name="servico" placeholder="" value={form.servico} onChange={handleChange} />
+          <input type="text" name="servico" value={form.servico} onChange={handleChange} />
         </div>
- 
+
         <div className="form-group">
           <label>Valor Total</label>
-          <input type="number" name="valor" placeholder="" value={form.valor} onChange={handleChange} />
+          <input type="number" name="valor" value={form.valor} onChange={handleChange} />
         </div>
- 
+
+        <div className="form-group">
+          <label>Quantidade de Pessoas</label>
+          <input type="number" name="pessoas" value={form.pessoas} onChange={handleChange} />
+        </div>
+
         <div className="form-group">
           <label>Descrição</label>
-          <input type="text" name="descricao" placeholder="" value={form.descricao} onChange={handleChange} />
+          <input type="text" name="descricao" value={form.descricao} onChange={handleChange} />
         </div>
       </div>
- 
-      <button className="btn-adicionar verde" onClick={handleAdicionar}>Adicionar Venda</button>
- 
+
+      <button className="btn-adicionar verde" onClick={handleAdicionar}>
+        Adicionar Venda
+      </button>
+
       {/* Tabela */}
       <h3 className="tabela-titulo">Vendas Recentes</h3>
       <table className="painel-tabela">
         <thead>
           <tr>
-            <th>ID</th><th>Data</th><th>Serviço</th><th>Valor</th>
+            <th>ID</th>
+            <th>Data</th>
+            <th>Serviço</th>
+            <th>Pessoas</th> {/* NOVO */}
+            <th>Valor</th>
           </tr>
         </thead>
         <tbody>
@@ -80,6 +107,7 @@ function Vendas() {
               <td>{v.id}</td>
               <td>{v.data}</td>
               <td>{v.servico}</td>
+              <td>{v.pessoas}</td> {/* NOVO */}
               <td>R${v.valor.toFixed(2).replace('.', ',')}</td>
             </tr>
           ))}
@@ -88,5 +116,5 @@ function Vendas() {
     </div>
   );
 }
- 
+
 export default Vendas;

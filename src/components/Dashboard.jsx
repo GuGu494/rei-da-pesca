@@ -124,12 +124,7 @@ function VisaoGeral() {
             <div className="barra-prog"><div className="barra-fill verde" style={{ width: '90%' }} /></div>
           </div>
  
-          <div className="resumo-item">
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#888' }}>
-              <span>Mesas Ocupadas</span><span>12/25</span>
-            </div>
-            <div className="barra-prog"><div className="barra-fill azul" style={{ width: '48%' }} /></div>
-          </div>
+
  
           <div className="resumo-item">
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#888' }}>
