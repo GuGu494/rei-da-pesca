@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Localizacao.css';
-import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaInstagram } from 'react-icons/fa';
  
 function Localizacao() {
   return (
@@ -16,8 +16,8 @@ function Localizacao() {
             <FaMapMarkerAlt className="info-icon" />
             <div>
               <strong>Endereço</strong>
-              <p>Estrada Rural, km 12 - Zona Rural</p>
-              <p>São Paulo - SP, 00000-000</p>
+              <p>Núcleo Rural - Pte. Alta Norte (Gama)</p>
+              <p>Brasília - DF, 72427-010</p>
             </div>
           </div>
  
@@ -25,22 +25,22 @@ function Localizacao() {
             <FaPhoneAlt className="info-icon" />
             <div>
               <strong>Telefone</strong>
-              <p>(61) 9 9999-9999</p>
+              <p>(61) 99206-1381</p>
             </div>
           </div>
  
           <div className="info-item">
-            <FaEnvelope className="info-icon" />
+            <FaInstagram className="info-icon" />
             <div>
-              <strong>E-mail</strong>
-              <p>contato@ecopesqueiro.com.br</p>
+              <strong>Instagram</strong>
+              <p>@pesquepagueflamboyant</p>
             </div>
           </div>
  
           <div className="horario-funcionamento">
+            <strong>Em pleno funcionamento desde 1998</strong>
             <strong>Horário de Funcionamento:</strong>
-            <p>Terça a Domingo: 8h às 18h</p>
-            <p>Segunda-feira: Fechado</p>
+            <p>Sábados, Domingos e Feriados - 9:00 às 17:00h</p>
           </div>
  
           {/* ✅ Link para a tela de login */}
