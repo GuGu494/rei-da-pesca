@@ -1,16 +1,60 @@
-# React + Vite
+Rei da Pesca
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site para Pesque-Pague - Gerencie sua experiência de pesca com facilidade!
 
-Currently, two official plugins are available:
+📌 Sobre o Projeto:
+O Rei da Pesca é uma plataforma web moderna desenvolvida para apresentar os serviços de um pesque-pague e facilitar a interação entre clientes e administradores.
+A aplicação permite que usuários realizem reservas de eventos, conheçam os serviços oferecidos e entrem em contato com o estabelecimento, enquanto os administradores possuem ferramentas completas para gerenciar o negócio.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+🧑‍💻 Público-Alvo:
+Clientes interessados em lazer e pesca
+Pessoas que desejam reservar eventos
+Administradores do pesque-pague
 
-## React Compiler
+🚀 Tecnologias Utilizadas:
+Front-end
+-React
+-JavaScript
+-HTML
+-CSS
+-Vite
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Back-end
+-Node.js
+-Express.js
 
-## Expanding the ESLint configuration
+Banco de Dados
+-PostgreSQL
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+✨ Funcionalidades:
+
+-👤 Área do Usuário
+✅ Página inicial com apresentação e destaques
+✅ Visualização dos serviços (restaurante, lazer, locação)
+✅ Realização de reservas de eventos
+✅ Formulário completo de agendamento
+✅ Página de contato com informações e localização
+✅ Interface responsiva e intuitiva
+
+-🛠️ Área Administrativa
+✅ Dashboard com indicadores (lucro, gastos, fluxo de pessoas)
+✅ Gráficos de faturamento
+✅ Gerenciamento financeiro (receitas e despesas)
+✅ Controle de estoque de produtos
+✅ Gerenciamento de reservas (visualizar, confirmar, cancelar)
+
+-🏗️ Arquitetura do Sistema
+
+O sistema segue o padrão cliente-servidor com API REST:
+-Front-end responsável pela interface do usuário
+-Back-end responsável pelas regras de negócio
+-Banco de dados para armazenamento das informações
+-Estrutura em camadas:
+-Interface (React)
+-API (Node.js)
+-Banco de Dados (PostgreSQL)
+🎯 Objetivos do Sistema
+-Divulgar os serviços do pesque-pague
+-Permitir reservas online de eventos
+-Melhorar a experiência do cliente
+-Auxiliar no controle financeiro e operacional
