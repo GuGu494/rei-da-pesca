@@ -1,23 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
- 
+import { supabase } from '../services/supabase';
+
 function Login() {
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false); // Novo estado para o botão
   const navigate = useNavigate();
- 
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Credenciais simples — troque conforme necessário
-    if (usuario === 'admin' && senha === 'admin123') {
-      navigate('/dashboard');
-    } else {
-      setErro('Usuário ou senha incorretos.');
+    setErro(''); // Limpa qualquer erro anterior
+    setCarregando(true); // Muda o status para carregando
+
+    try {
+      // Consulta na tabela 'usuarios' do Supabase
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('username', usuario)
+        .eq('senha_hash', senha)
+        .single(); // .single() garante que retorne apenas 1 usuário exato
+
+      if (error || !data) {
+        setErro('Usuário ou senha incorretos.');
+      } else {
+        // Se achou o usuário no banco, vai para o dashboard
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setErro('Erro ao conectar com o servidor.');
+      console.error(err);
+    } finally {
+      setCarregando(false); // Tira o status de carregando independente do resultado
     }
   };
- 
+
   return (
     <div className="login-page">
       <div className="login-logo">
@@ -30,10 +50,10 @@ function Login() {
         <h1>Rei da Pesca</h1>
         <p>Painel Administrativo</p>
       </div>
- 
+
       <div className="login-card">
         <h2>Fazer Login</h2>
- 
+
         <form onSubmit={handleLogin} className="login-form">
           <div className="login-field">
             <label htmlFor="usuario">Usuário</label>
@@ -54,7 +74,7 @@ function Login() {
               />
             </div>
           </div>
- 
+
           <div className="login-field">
             <label htmlFor="senha">Senha</label>
             <div className="input-wrapper">
@@ -74,18 +94,20 @@ function Login() {
               />
             </div>
           </div>
- 
+
           {erro && <p className="login-erro">{erro}</p>}
- 
-          <button type="submit" className="login-btn">Entrar</button>
+
+          <button type="submit" className="login-btn" disabled={carregando}>
+            {carregando ? 'Entrando...' : 'Entrar'}
+          </button>
         </form>
       </div>
- 
+
       <button className="voltar-site" onClick={() => navigate('/')}>
         ← Voltar ao site
       </button>
     </div>
   );
 }
- 
+
 export default Login;

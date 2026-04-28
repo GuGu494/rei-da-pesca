@@ -1,35 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PainelSecao.css';
- 
-const estoqueInicial = [
-  { id: 1, data: '15/03/2026', item: 'Peixe',   quantidade: 15, custo: 500, fornecedor: 'Pesque Pague'  },
-  { id: 2, data: '16/03/2026', item: 'Arroz',   quantidade: 20, custo: 150, fornecedor: 'Atacadão'      },
-  { id: 3, data: '17/03/2026', item: 'Cerveja', quantidade: 40, custo: 220, fornecedor: 'Distribuidora' },
-];
- 
+import { supabase } from '../services/supabase';
+
 function EstoqueAlimenticio() {
-  const [estoque, setEstoque] = useState(estoqueInicial);
+  const [estoque, setEstoque] = useState([]);
+  const [carregando, setCarregando] = useState(false);
   const [form, setForm] = useState({
-    data: '', categoria: '', item: '', descricao: '',
+    data: '', tipo_movimentacao: '', item: '',
     quantidade: '', unidade: '', custo: '', fornecedor: '',
   });
- 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
- 
-  const handleAdicionar = () => {
-    if (!form.data || !form.item || !form.quantidade) return;
-    const novo = {
-      id: estoque.length + 1,
-      data: form.data,
-      item: form.item,
-      quantidade: parseFloat(form.quantidade),
-      custo: parseFloat(form.custo) || 0,
-      fornecedor: form.fornecedor,
-    };
-    setEstoque([...estoque, novo]);
-    setForm({ data: '', categoria: '', item: '', descricao: '', quantidade: '', unidade: '', custo: '', fornecedor: '' });
+
+  // Busca o estoque do banco ao carregar a tela
+  useEffect(() => {
+    buscarEstoque();
+  }, []);
+
+  const buscarEstoque = async () => {
+    const { data, error } = await supabase
+      .from('estoque')
+      .select('*')
+      .order('data_movimentacao', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao buscar estoque:', error);
+    } else {
+      setEstoque(data);
+    }
   };
- 
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleAdicionar = async () => {
+    // Validação simples
+    if (!form.data || !form.item || !form.quantidade || !form.tipo_movimentacao) {
+      alert("Preencha todos os campos obrigatórios (Data, Tipo, Item e Quantidade)!");
+      return;
+    }
+
+    setCarregando(true);
+
+    try {
+      // Inserindo os dados na tabela 'estoque'
+      const { error } = await supabase
+        .from('estoque')
+        .insert([
+          {
+            data_movimentacao: form.data,
+            tipo_movimentacao: form.tipo_movimentacao,
+            item: form.item,
+            quantidade: parseFloat(form.quantidade),
+            unidade: form.unidade,
+            custo_total: parseFloat(form.custo) || 0,
+            fornecedor: form.fornecedor,
+          }
+        ]);
+
+      if (error) throw error;
+
+      alert("Item registrado no estoque com sucesso!");
+      
+      // Limpa o formulário e atualiza a tabela
+      setForm({ data: '', tipo_movimentacao: '', item: '', quantidade: '', unidade: '', custo: '', fornecedor: '' });
+      buscarEstoque();
+      
+    } catch (error) {
+      console.error('Erro ao inserir no estoque:', error);
+      alert("Erro ao salvar no banco de dados.");
+    } finally {
+      setCarregando(false);
+    }
+  };
+
   return (
     <div className="secao-card">
       <div className="secao-titulo">
@@ -40,76 +81,119 @@ function EstoqueAlimenticio() {
         </svg>
         <h2>Lançamento de Estoque</h2>
       </div>
- 
+
       <div className="form-grid">
         <div className="form-group">
-          <label>Data</label>
+          <label>Data *</label>
           <div className="input-icon-wrap">
             <input type="date" name="data" value={form.data} onChange={handleChange} />
             <span className="campo-icone">📅</span>
           </div>
         </div>
- 
+
         <div className="form-group">
-          <label>Categoria</label>
-          <input type="text" name="categoria" value={form.categoria} onChange={handleChange} />
+          <label>Tipo (Entrada / Saída) *</label>
+          <input 
+            type="text" 
+            name="tipo_movimentacao" 
+            placeholder="Ex: Entrada" 
+            value={form.tipo_movimentacao} 
+            onChange={handleChange} 
+          />
         </div>
- 
+
         <div className="form-group">
-          <label>Item</label>
-          <input type="text" name="item" value={form.item} onChange={handleChange} />
+          <label>Item *</label>
+          <input 
+            type="text" 
+            name="item" 
+            placeholder="Ex: Tilápia, Cerveja..."
+            value={form.item} 
+            onChange={handleChange} 
+          />
         </div>
- 
+
         <div className="form-group">
-          <label>Descrição</label>
-          <input type="text" name="descricao" value={form.descricao} onChange={handleChange} />
+          <label>Fornecedor</label>
+          <input 
+            type="text" 
+            name="fornecedor" 
+            placeholder="Nome da empresa"
+            value={form.fornecedor} 
+            onChange={handleChange} 
+          />
         </div>
- 
+
         <div className="form-group">
-          <label>Quantidade</label>
+          <label>Quantidade *</label>
           <input type="number" name="quantidade" value={form.quantidade} onChange={handleChange} />
         </div>
- 
+
         <div className="form-group">
-          <label>Unidade – ex: kg, litros, etc.</label>
-          <input type="text" name="unidade" value={form.unidade} onChange={handleChange} />
+          <label>Unidade</label>
+          <input 
+            type="text" 
+            name="unidade" 
+            placeholder="ex: kg, litros, fardos"
+            value={form.unidade} 
+            onChange={handleChange} 
+          />
         </div>
- 
+
         <div className="form-group">
           <label>Custo Total R$</label>
           <input type="number" name="custo" value={form.custo} onChange={handleChange} />
         </div>
- 
-        <div className="form-group">
-          <label>Fornecedor</label>
-          <input type="text" name="fornecedor" value={form.fornecedor} onChange={handleChange} />
-        </div>
       </div>
- 
-      <button className="btn-adicionar verde" onClick={handleAdicionar}>Adicionar Item</button>
- 
-      <h3 className="tabela-titulo">Estoque Recente</h3>
+
+      <button 
+        className="btn-adicionar verde" 
+        onClick={handleAdicionar}
+        disabled={carregando}
+      >
+        {carregando ? 'Salvando...' : 'Adicionar Item'}
+      </button>
+
+      <h3 className="tabela-titulo">Movimentações Recentes</h3>
       <table className="painel-tabela">
         <thead>
           <tr>
-            <th>ID</th><th>Data</th><th>Item</th><th>Quantidade</th><th>Custo total</th><th>Fornecedor</th>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Item</th>
+            <th>Qtd</th>
+            <th>Custo Total</th>
+            <th>Fornecedor</th>
           </tr>
         </thead>
         <tbody>
-          {estoque.map((e) => (
-            <tr key={e.id}>
-              <td>{e.id}</td>
-              <td>{e.data}</td>
-              <td>{e.item}</td>
-              <td>{e.quantidade}</td>
-              <td>R${e.custo.toFixed(2).replace('.', ',')}</td>
-              <td>{e.fornecedor}</td>
+          {estoque.length === 0 ? (
+            <tr>
+              <td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>Nenhum item registrado.</td>
             </tr>
-          ))}
+          ) : (
+            estoque.map((e) => (
+              <tr key={e.id}>
+                <td>{new Date(e.data_movimentacao).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
+                <td>
+                  <span style={{ 
+                    color: e.tipo_movimentacao.toLowerCase() === 'saída' || e.tipo_movimentacao.toLowerCase() === 'saida' ? '#d9534f' : '#2d6a2d',
+                    fontWeight: 'bold'
+                  }}>
+                    {e.tipo_movimentacao}
+                  </span>
+                </td>
+                <td>{e.item}</td>
+                <td>{e.quantidade} {e.unidade}</td>
+                <td>{e.custo_total ? `R$ ${Number(e.custo_total).toFixed(2).replace('.', ',')}` : '-'}</td>
+                <td>{e.fornecedor || '-'}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
   );
 }
- 
+
 export default EstoqueAlimenticio;

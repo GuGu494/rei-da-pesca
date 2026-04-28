@@ -1,33 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import Vendas from './Vendas';
 import Gastos from './Gastos';
-import ReservasEvento from './ReservasEvento';
 import EstoqueAlimenticio from './EstoqueAlimenticio';
- 
-// ---- Dados mockados para Visão Geral ----
-const dadosSemana = [
-  { dia: 'Seg', valor: 4800 },
-  { dia: 'Ter', valor: 5600 },
-  { dia: 'Qua', valor: 4500 },
-  { dia: 'Qui', valor: 4300 },
-  { dia: 'Sex', valor: 3200 },
-  { dia: 'Sab', valor: 3700 },
-  { dia: 'Dom', valor: 2900 },
-];
-const maxValor = Math.max(...dadosSemana.map((d) => d.valor));
- 
-const secaoInfo = {
-  'Visão Geral':         { titulo: 'Painel de Gestão',        sub: 'Monitore o desempenho do seu negócio' },
-  'Vendas':              { titulo: 'Vendas',                   sub: 'Deixe registrado as vendas do dia.' },
-  'Gastos':              { titulo: 'Gastos',                   sub: 'Deixe registrado os gastos do dia.' },
-  'Reservas de evento':  { titulo: 'Reservas de evento',       sub: 'Deixe registrado as reservas do seu espaço.' },
-  'Estoque Alimentício': { titulo: 'Estoque Alimentício',      sub: 'Deixe registrado o seu estoque.' },
-};
- 
-const menus = ['Visão Geral', 'Vendas', 'Gastos', 'Reservas de evento', 'Estoque Alimentício'];
- 
+import GestaoReservas from './GestaoReservas';
+import ReservasEvento from './ReservasEvento';
+import { supabase } from '../services/supabase';
+
 function LogoPeixe() {
   return (
     <svg width="36" height="24" viewBox="0 0 80 50" fill="none">
@@ -37,182 +17,224 @@ function LogoPeixe() {
     </svg>
   );
 }
- 
-function VisaoGeral() {
+
+// ---- COMPONENTE: VISÃO GERAL ----
+function VisaoGeral({ periodo }) {
+  const [metricas, setMetricas] = useState({
+    lucro: 0, gastos: 0, fluxoReal: 0, expectativaHoje: 0, reservasPendentes: 0, contagemVendas: 0, kgPeixe: 0
+  });
+  const [dadosGrafico, setDadosGrafico] = useState([]);
+  const [maxValor, setMaxValor] = useState(1000);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    buscarDadosDashboard();
+  }, [periodo]);
+
+  const buscarDadosDashboard = async () => {
+    setCarregando(true);
+    try {
+      const hoje = new Date().toISOString().split('T')[0];
+      const mesAtual = hoje.substring(0, 7);
+
+      const { data: todasVendas } = await supabase.from('vendas').select('*');
+      const { data: todosGastos } = await supabase.from('gastos').select('*');
+      const { data: estoque } = await supabase.from('estoque').select('*');
+      
+      // Busca reservas de hoje para a etiqueta "+X previstas"
+      const { data: reservasHoje } = await supabase.from('reservas')
+        .select('numero_pessoas')
+        .eq('data_reserva', hoje)
+        .eq('status', 'Confirmada');
+
+      const { count: pendentes } = await supabase.from('reservas')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Pendente');
+
+      let vendasFiltradas = todasVendas || [];
+      let gastosFiltrados = todosGastos || [];
+
+      if (periodo === 'Hoje') {
+        vendasFiltradas = vendasFiltradas.filter(v => v.data_venda === hoje);
+        gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto === hoje);
+      } else if (periodo === 'Mês') {
+        vendasFiltradas = vendasFiltradas.filter(v => v.data_venda.startsWith(mesAtual));
+        gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto.startsWith(mesAtual));
+      }
+
+      const totalVendas = vendasFiltradas.reduce((acc, curr) => acc + Number(curr.valor_total), 0);
+      const totalGastos = gastosFiltrados.reduce((acc, curr) => acc + Number(curr.valor_total), 0);
+      
+      const kgPeixeTotal = estoque?.filter(i => i.item.toLowerCase().includes('peixe') || i.item.toLowerCase().includes('tilápia'))
+                                   .reduce((acc, curr) => acc + Number(curr.quantidade), 0) || 0;
+
+      setMetricas({
+        lucro: totalVendas - totalGastos,
+        gastos: totalGastos,
+        fluxoReal: vendasFiltradas.reduce((acc, curr) => acc + Number(curr.quantidade_pessoas), 0),
+        expectativaHoje: reservasHoje?.reduce((acc, curr) => acc + Number(curr.numero_pessoas), 0) || 0,
+        reservasPendentes: pendentes || 0,
+        contagemVendas: vendasFiltradas.length,
+        kgPeixe: kgPeixeTotal
+      });
+
+      const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+      const lista7Dias = [];
+      const dataAtual = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const diaAlvo = new Date();
+        diaAlvo.setDate(dataAtual.getDate() - i);
+        const faturamentoDia = todasVendas?.filter(v => v.data_venda === diaAlvo.toISOString().split('T')[0]).reduce((acc, curr) => acc + Number(curr.valor_total), 0) || 0;
+        lista7Dias.push({ dia: diasSemana[diaAlvo.getDay()], valor: faturamentoDia });
+      }
+      setDadosGrafico(lista7Dias);
+      setMaxValor(Math.max(...lista7Dias.map(d => d.valor), 1000));
+
+    } catch (err) { console.error(err); } finally { setCarregando(false); }
+  };
+
+  if (carregando) return <p style={{ padding: '20px' }}>Sincronizando Dashboard...</p>;
+
   return (
     <>
       <div className="cards-grid">
         <div className="card">
-          <div className="card-icon verde">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-              <polyline points="17 6 23 6 23 12"/>
-            </svg>
-          </div>
-          <span className="card-label">Lucro Total</span>
-          <span className="card-valor">R$ 12.500,00</span>
-          <span className="card-variacao positivo">▲ +12,5%</span>
+          <div className="card-icon verde">💰</div>
+          <span className="card-label">Lucro ({periodo})</span>
+          <span className={`card-valor ${metricas.lucro < 0 ? 'negativo-cor' : ''}`}>
+            R$ {metricas.lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </span>
+          <span className="card-sub">Total líquido</span>
         </div>
- 
+
         <div className="card">
-          <div className="card-icon vermelho">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-              <polyline points="17 18 23 18 23 12"/>
-            </svg>
-          </div>
-          <span className="card-label">Gastos Totais</span>
-          <span className="card-valor">R$ 4.300,00</span>
-          <span className="card-variacao negativo">▼ -8,2%</span>
+          <div className="card-icon vermelho">📉</div>
+          <span className="card-label">Gastos ({periodo})</span>
+          <span className="card-valor">R$ {metricas.gastos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+          <span className="card-sub">Saídas de caixa</span>
         </div>
- 
+
+        {/* CARD DE FLUXO COM A VOLTA DAS ETIQUETAS */}
         <div className="card">
-          <div className="card-icon azul">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
+          <div className="card-icon azul">👥</div>
           <span className="card-label">Fluxo de Pessoas</span>
-          <span className="card-valor">212</span>
-          <span className="card-variacao positivo">▲ +22,5%</span>
+          <span className="card-valor">{metricas.fluxoReal}</span>
+          <span className="card-sub">Realizado (Vendas)</span>
+          {metricas.expectativaHoje > 0 && (
+            <div className="expectativa-badge">+{metricas.expectativaHoje} previstas hoje</div>
+          )}
         </div>
- 
+
         <div className="card">
-          <div className="card-icon amarelo">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <span className="card-label">Reservas de Hoje</span>
-          <span className="card-valor">10</span>
-          <span className="card-sub">2 confirmadas</span>
+          <div className="card-icon amarelo">⏳</div>
+          <span className="card-label">Reservas Pendentes</span>
+          <span className="card-valor">{metricas.reservasPendentes}</span>
+          <span className="card-sub">No site público</span>
         </div>
       </div>
- 
+
       <div className="bottom-grid">
         <div className="grafico-card">
           <div className="grafico-header">
-            <div>
-              <strong>Faturamento - Últimos 7 Dias</strong>
-              <p>Receita diária do estabelecimento</p>
-            </div>
+            <strong>Faturamento Semanal</strong>
+            <p>Tendência dos últimos 7 dias</p>
           </div>
           <div className="barras">
-            {dadosSemana.map((item) => (
-              <div key={item.dia} className="barra-col">
-                <span className="barra-valor">R$ {(item.valor / 1000).toFixed(1)}k</span>
+            {dadosGrafico.map((item, idx) => (
+              <div key={idx} className="barra-col">
+                <span className="barra-valor">R$ {item.valor.toFixed(0)}</span>
                 <div className="barra" style={{ height: `${(item.valor / maxValor) * 160}px` }} />
                 <span className="barra-dia">{item.dia}</span>
               </div>
             ))}
           </div>
         </div>
- 
-        <div className="resumo-card">
-          <strong className="resumo-titulo">Resumo do Dia</strong>
- 
-          <div className="resumo-item">
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#888' }}>
-              <span>Total de Vendas</span><span>32</span>
-            </div>
-            <div className="barra-prog"><div className="barra-fill verde" style={{ width: '90%' }} /></div>
-          </div>
- 
 
- 
+        <div className="resumo-card">
+          <strong className="resumo-titulo">Resumo: {periodo}</strong>
           <div className="resumo-item">
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#888' }}>
-              <span>Peixes Pescados</span><span>100kg</span>
+              <span>Vendas Realizadas</span><span>{metricas.contagemVendas}</span>
             </div>
-            <div className="barra-prog"><div className="barra-fill vermelho" style={{ width: '65%' }} /></div>
+            <div className="barra-prog"><div className="barra-fill verde" style={{ width: `${Math.min(metricas.contagemVendas * 10, 100)}%` }} /></div>
           </div>
- 
-          <strong className="resumo-titulo" style={{ marginTop: '20px' }}>Avisos Importante</strong>
-          <div className="aviso aviso-amarelo">Grupo de 25 pessoas às 15h</div>
-          <div className="aviso aviso-azul">Estoque de tilápia abaixo de 50kg</div>
+          <div className="resumo-item">
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#888' }}>
+              <span>Estoque de Peixe</span><span>{metricas.kgPeixe}kg</span>
+            </div>
+            <div className="barra-prog"><div className="barra-fill vermelho" style={{ width: `${Math.min(metricas.kgPeixe, 100)}%` }} /></div>
+          </div>
+          <strong className="resumo-titulo" style={{ marginTop: '20px' }}>Avisos</strong>
+          {metricas.expectativaHoje > 0 && (
+            <div className="aviso aviso-amarelo">Expectativa de {metricas.expectativaHoje} pessoas hoje</div>
+          )}
+          <div className="aviso aviso-azul">Status: Dados em tempo real</div>
         </div>
       </div>
     </>
   );
 }
- 
+
+// ---- COMPONENTE PRINCIPAL ----
 function Dashboard() {
   const [menuAtivo, setMenuAtivo] = useState('Visão Geral');
+  const [periodo, setPeriodo] = useState('Semana');
   const navigate = useNavigate();
- 
-  const info = secaoInfo[menuAtivo] || secaoInfo['Visão Geral'];
- 
-  const renderSecao = () => {
-    switch (menuAtivo) {
-      case 'Vendas':              return <Vendas />;
-      case 'Gastos':              return <Gastos />;
-      case 'Reservas de evento':  return <ReservasEvento />;
-      case 'Estoque Alimentício': return <EstoqueAlimenticio />;
-      default:                    return <VisaoGeral />;
-    }
-  };
- 
+
   return (
     <div className="dashboard-layout">
       <aside className="sidebar">
-        <div className="sidebar-logo">
-          <LogoPeixe />
-          <span>Rei da Pesca</span>
-        </div>
- 
+        <div className="sidebar-logo"><LogoPeixe /><span>Rei da Pesca</span></div>
         <nav className="sidebar-nav">
-          {menus.map((item) => (
-            <button
-              key={item}
-              className={`nav-item ${menuAtivo === item ? 'ativo' : ''}`}
-              onClick={() => setMenuAtivo(item)}
-            >
-              {item}
-            </button>
+          {['Visão Geral', 'Vendas', 'Gastos', 'Reservas de evento', 'Estoque Alimentício'].map(m => (
+            <button key={m} className={`nav-item ${menuAtivo === m ? 'ativo' : ''}`} onClick={() => setMenuAtivo(m)}>{m}</button>
           ))}
+          
+          <hr style={{ border: '0', borderTop: '1px solid #3d3d3d', margin: '15px 0' }} />
+          <button className="nav-item" onClick={() => navigate('/')} style={{ color: '#888', fontSize: '0.85rem' }}>
+             🏠 Voltar ao Site Público
+          </button>
         </nav>
- 
-        <button className="sair-btn" onClick={() => navigate('/login')}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Sair
-        </button>
+        <button className="sair-btn" onClick={() => navigate('/login')}>Sair</button>
       </aside>
- 
+
       <main className="main-content">
         <div className="painel-header">
           <div>
-            <h1>{info.titulo}</h1>
-            <p>{info.sub}</p>
+            <button 
+              onClick={() => navigate('/')} 
+              style={{ background: 'none', border: 'none', color: '#2d6a2d', cursor: 'pointer', fontSize: '0.85rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold' }}
+            >
+              ← Voltar ao Site
+            </button>
+            <h1>{menuAtivo === 'Visão Geral' ? 'Painel de Gestão' : menuAtivo}</h1>
+            <p>Controle de dados: <strong>{periodo}</strong></p>
           </div>
           {menuAtivo === 'Visão Geral' && (
             <div className="periodo-btns">
-              <button className="periodo-btn">Hoje</button>
-              <button className="periodo-btn ativo">Semana</button>
-              <button className="periodo-btn">Mês</button>
+              {['Hoje', 'Semana', 'Mês'].map(p => (
+                <button 
+                  key={p} 
+                  className={`periodo-btn ${periodo === p ? 'ativo' : ''}`}
+                  onClick={() => setPeriodo(p)}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
           )}
         </div>
- 
-        {menuAtivo === 'Visão Geral' && (
-          <button className="voltar-site-dash" onClick={() => navigate('/')}>
-            ← Voltar ao Site
-          </button>
-        )}
- 
-        {renderSecao()}
+
+        <div className="conteudo-dinamico">
+          {menuAtivo === 'Vendas' && <Vendas />}
+          {menuAtivo === 'Gastos' && <Gastos />}
+          {menuAtivo === 'Reservas de evento' && <ReservasEvento />}
+          {menuAtivo === 'Estoque Alimentício' && <EstoqueAlimenticio />}
+          {menuAtivo === 'Visão Geral' && <VisaoGeral periodo={periodo} />}
+        </div>
       </main>
     </div>
   );
 }
- 
+
 export default Dashboard;
