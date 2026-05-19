@@ -68,6 +68,22 @@
   font-weight: 600;
 }
 
+/* NOVA CLASSE: DISTINTIVO PISCANTE NA SIDEBAR */
+.sidebar-badge-alerta {
+  background-color: #e74c3c;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 50%;
+  animation: pulse-alerta 1.5s infinite alternate;
+}
+
+@keyframes pulse-alerta {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 8px rgba(231, 76, 60, 0.6); }
+}
+
 .sair-btn {
   display: flex;
   align-items: center;
@@ -141,42 +157,59 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.voltar-site-dash {
-  background: none;
-  border: none;
-  color: #555;
-  font-size: 0.88rem;
-  cursor: pointer;
-  padding: 4px 0;
-  margin-bottom: 20px;
+/* NOVAS CLASSES: ALERTA DE ESTOQUE NO TOPO DA TELA */
+.alerta-estoque-topo {
+  background-color: #fff8e1;
+  border-left: 5px solid #f59e0b;
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+
+.alerta-estoque-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-family: inherit;
-  transition: color 0.2s;
+  gap: 8px;
+  color: #b45309;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
 }
 
-.voltar-site-dash:hover {
-  color: #2d6a2d;
+.alerta-estoque-corpo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-/* ===== CARDS ===== */
+.alerta-estoque-tag {
+  background: rgba(245, 158, 11, 0.12);
+  color: #78350f;
+  font-size: 0.82rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* CARDS RE-ESTILIZADOS */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 20px;
+  margin-bottom: 24px;
+  width: 100%;
 }
 
 .card {
-  width: 300px;
+  width: 100%;
+  min-height: 140px;
   background: #fff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  gap: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .card-icon {
@@ -189,53 +222,24 @@
   margin-bottom: 4px;
 }
 
-.card-icon.verde {
-  background: #e8f5e9;
-  color: #2d6a2d;
-}
+.card-icon.verde { background: #e8f5e9; color: #2d6a2d; }
+.card-icon.vermelho { background: #fdecea; color: #c0392b; }
+.card-icon.azul { background: #e8f0fe; color: #2563eb; }
+.card-icon.amarelo { background: #fff8e1; color: #f59e0b; }
 
-.card-icon.vermelho {
-  background: #fdecea;
-  color: #c0392b;
-}
+.card-label { font-size: 0.8rem; color: #888; }
+.card-valor { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; }
+.card-sub { font-size: 0.78rem; color: #aaa; }
 
-.card-icon.azul {
-  background: #e8f0fe;
+.expectativa-badge {
+  background-color: #e8f0fe;
   color: #2563eb;
-}
-
-.card-icon.amarelo {
-  background: #fff8e1;
-  color: #f59e0b;
-}
-
-.card-label {
-  font-size: 0.8rem;
-  color: #888;
-}
-
-.card-valor {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1a1a2e;
-}
-
-.card-variacao {
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.card-variacao.positivo {
-  color: #2d6a2d;
-}
-
-.card-variacao.negativo {
-  color: #c0392b;
-}
-
-.card-sub {
-  font-size: 0.78rem;
-  color: #aaa;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  align-self: flex-start;
 }
 
 /* ===== BOTTOM GRID ===== */
@@ -253,16 +257,8 @@
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
-.grafico-header strong {
-  font-size: 0.95rem;
-  color: #1a1a2e;
-}
-
-.grafico-header p {
-  font-size: 0.8rem;
-  color: #aaa;
-  margin: 2px 0 20px;
-}
+.grafico-header strong { font-size: 0.95rem; color: #1a1a2e; }
+.grafico-header p { font-size: 0.8rem; color: #aaa; margin: 2px 0 20px; }
 
 .barras {
   display: flex;
@@ -282,11 +278,7 @@
   justify-content: flex-end;
 }
 
-.barra-valor {
-  font-size: 0.7rem;
-  color: #aaa;
-}
-
+.barra-valor { font-size: 0.7rem; color: #aaa; }
 .barra {
   width: 100%;
   background: #2d6a2d;
@@ -295,11 +287,7 @@
   transition: height 0.3s;
 }
 
-.barra-dia {
-  font-size: 0.78rem;
-  color: #888;
-  margin-top: 4px;
-}
+.barra-dia { font-size: 0.78rem; color: #888; margin-top: 4px; }
 
 /* Resumo do Dia */
 .resumo-card {
@@ -312,94 +300,41 @@
   gap: 12px;
 }
 
-.resumo-titulo {
-  font-size: 0.9rem;
-  color: #1a1a2e;
+.resumo-titulo { font-size: 0.9rem; color: #1a1a2e; }
+.resumo-item { display: flex; flex-direction: column; gap: 4px; }
+.resumo-item>span:first-child { font-size: 0.78rem; color: #888; display: flex; justify-content: space-between; }
+
+.barra-prog { height: 6px; background: #f0f0f0; border-radius: 999px; overflow: hidden; }
+.barra-fill { height: 100%; border-radius: 999px; }
+.barra-fill.verde { background: #2d6a2d; }
+.barra-fill.vermelho { background: #e74c3c; }
+
+.aviso { padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+.aviso-amarelo { background: #fff8e1; color: #856404; }
+.aviso-azul { background: #e8f0fe; color: #1d4ed8; }
+
+/* AVISO CRÍTICO DE ESTOQUE NO CARD RESUMO */
+.aviso-vermelho-pisca {
+  background: #fdecea;
+  color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  animation: piscar-suave 2s infinite;
 }
 
-.resumo-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.resumo-item>span:first-child {
-  font-size: 0.78rem;
-  color: #888;
-  display: flex;
-  justify-content: space-between;
-}
-
-.resumo-item>span:last-of-type {
-  font-size: 0.78rem;
-  color: #555;
-  text-align: right;
-}
-
-.barra-prog {
-  height: 6px;
-  background: #f0f0f0;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.barra-fill {
-  height: 100%;
-  border-radius: 999px;
-}
-
-.barra-fill.verde {
-  background: #2d6a2d;
-}
-
-.barra-fill.azul {
-  background: #2563eb;
-}
-
-.barra-fill.vermelho {
-  background: #e74c3c;
-}
-
-.aviso {
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.aviso-amarelo {
-  background: #fff8e1;
-  color: #856404;
-}
-
-.aviso-azul {
-  background: #e8f0fe;
-  color: #1d4ed8;
+@keyframes piscar-suave {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; background-color: #fbdcd8; }
+  100% { opacity: 0.8; }
 }
 
 /* ===== RESPONSIVO ===== */
 @media (max-width: 900px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .bottom-grid {
-    grid-template-columns: 1fr;
-  }
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .bottom-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
-  .sidebar {
-    width: 60px;
-  }
-
-  .sidebar-logo span,
-  .nav-item {
-    display: none;
-  }
-
-  .main-content {
-    margin-left: 60px;
-    padding: 16px;
-  }
+  .sidebar { width: 60px; }
+  .sidebar-logo span, .nav-item span, .sidebar-badge-alerta { display: none; }
+  .main-content { margin-left: 60px; padding: 16px; }
 }

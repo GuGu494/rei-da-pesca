@@ -19,7 +19,7 @@ function LogoPeixe() {
 }
 
 // ---- COMPONENTE: VISÃO GERAL ----
-function VisaoGeral({ periodo }) {
+function VisaoGeral({ periodo, itensBaixoEstoque }) {
   const [metricas, setMetricas] = useState({
     lucro: 0, gastos: 0, fluxoReal: 0, expectativaHoje: 0, reservasPendentes: 0, contagemVendas: 0, kgPeixe: 0
   });
@@ -29,19 +29,25 @@ function VisaoGeral({ periodo }) {
 
   useEffect(() => {
     buscarDadosDashboard();
-  }, [periodo]);
+  }, [periodo, itensBaixoEstoque]);
 
   const buscarDadosDashboard = async () => {
     setCarregando(true);
     try {
-      const hoje = new Date().toISOString().split('T')[0];
+      // 1. Definição precisa das datas no escopo atual
+      const hojeObj = new Date();
+      const hoje = hojeObj.toISOString().split('T')[0];
       const mesAtual = hoje.substring(0, 7);
+
+      // Descobre o início da semana atual (último Domingo) para zerar o faturamento semanal
+      const domingoAtual = new Date(hojeObj);
+      domingoAtual.setDate(hojeObj.getDate() - hojeObj.getDay());
+      const dataInicioSemana = domingoAtual.toISOString().split('T')[0];
 
       const { data: todasVendas } = await supabase.from('vendas').select('*');
       const { data: todosGastos } = await supabase.from('gastos').select('*');
       const { data: estoque } = await supabase.from('estoque').select('*');
       
-      // Busca reservas de hoje para a etiqueta "+X previstas"
       const { data: reservasHoje } = await supabase.from('reservas')
         .select('numero_pessoas')
         .eq('data_reserva', hoje)
@@ -53,40 +59,73 @@ function VisaoGeral({ periodo }) {
 
       let vendasFiltradas = todasVendas || [];
       let gastosFiltrados = todosGastos || [];
+      let estoqueFiltrado = estoque || [];
 
+      // 2. Lógica de filtragem por período selecionado (Cards e Resumos)
       if (periodo === 'Hoje') {
         vendasFiltradas = vendasFiltradas.filter(v => v.data_venda === hoje);
         gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto === hoje);
+        estoqueFiltrado = estoqueFiltrado.filter(e => e.data_movimentacao === hoje);
+      } else if (periodo === 'Semana') {
+        vendasFiltradas = vendasFiltradas.filter(v => v.data_venda >= dataInicioSemana && v.data_venda <= today);
+        gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto >= dataInicioSemana && g.data_gasto <= hoje);
+        estoqueFiltrado = estoqueFiltrado.filter(e => e.data_movimentacao >= dataInicioSemana && e.data_movimentacao <= hoje);
       } else if (periodo === 'Mês') {
         vendasFiltradas = vendasFiltradas.filter(v => v.data_venda.startsWith(mesAtual));
         gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto.startsWith(mesAtual));
+        estoqueFiltrado = estoqueFiltrado.filter(e => e.data_movimentacao.startsWith(mesAtual));
       }
 
+      // 3. Consolidação financeira unificada
+      const totalGastosDiretos = gastosFiltrados.reduce((acc, curr) => acc + Number(curr.valor_total), 0);
+      const totalGastosEstoque = estoqueFiltrado
+        .filter(e => e.tipo_movimentacao.toLowerCase().trim() === 'entrada')
+        .reduce((acc, curr) => acc + Number(curr.custo_total || 0), 0);
+
+      const totalGastosUnificados = totalGastosDiretos + totalGastosEstoque;
       const totalVendas = vendasFiltradas.reduce((acc, curr) => acc + Number(curr.valor_total), 0);
-      const totalGastos = gastosFiltrados.reduce((acc, curr) => acc + Number(curr.valor_total), 0);
       
-      const kgPeixeTotal = estoque?.filter(i => i.item.toLowerCase().includes('peixe') || i.item.toLowerCase().includes('tilápia'))
-                                   .reduce((acc, curr) => acc + Number(curr.quantidade), 0) || 0;
+      // CORREÇÃO: Calcula o saldo REAL de peixe varrendo TODO o histórico acumulado (Independe da semana)
+      let saldoRealPeixe = 0;
+      estoque?.forEach(mov => {
+        const nomeItem = mov.item.toLowerCase().trim();
+        if (nomeItem.includes('peixe') || nomeItem.includes('tilápia') || nomeItem.includes('tilapia')) {
+          const qtd = Number(mov.quantidade) || 0;
+          const tipo = mov.tipo_movimentacao.toLowerCase().trim();
+          if (tipo === 'entrada') saldoRealPeixe += qtd;
+          if (tipo === 'saída' || tipo === 'saida') saldoRealPeixe -= qtd;
+        }
+      });
 
       setMetricas({
-        lucro: totalVendas - totalGastos,
-        gastos: totalGastos,
+        lucro: totalVendas - totalGastosUnificados,
+        gastos: totalGastosUnificados,
         fluxoReal: vendasFiltradas.reduce((acc, curr) => acc + Number(curr.quantidade_pessoas), 0),
         expectativaHoje: reservasHoje?.reduce((acc, curr) => acc + Number(curr.numero_pessoas), 0) || 0,
         reservasPendentes: pendentes || 0,
         contagemVendas: vendasFiltradas.length,
-        kgPeixe: kgPeixeTotal
+        kgPeixe: Math.max(saldoRealPeixe, 0)
       });
 
+      // 4. Lógica do Gráfico de Barras fixado na Semana Atual do Calendário
       const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
       const lista7Dias = [];
-      const dataAtual = new Date();
-      for (let i = 6; i >= 0; i--) {
-        const diaAlvo = new Date();
-        diaAlvo.setDate(dataAtual.getDate() - i);
-        const faturamentoDia = todasVendas?.filter(v => v.data_venda === diaAlvo.toISOString().split('T')[0]).reduce((acc, curr) => acc + Number(curr.valor_total), 0) || 0;
-        lista7Dias.push({ dia: diasSemana[diaAlvo.getDay()], valor: faturamentoDia });
+      
+      for (let i = 0; i < 7; i++) {
+        const diaBarra = new Date(domingoAtual);
+        diaBarra.setDate(domingoAtual.getDate() + i);
+        const diaBarraStr = diaBarra.toISOString().split('T')[0];
+
+        const faturamentoDia = todasVendas
+          ?.filter(v => v.data_venda === diaBarraStr)
+          .reduce((acc, curr) => acc + Number(curr.valor_total), 0) || 0;
+
+        lista7Dias.push({ 
+          dia: diasSemana[diaBarra.getDay()], 
+          valor: faturamentoDia 
+        });
       }
+
       setDadosGrafico(lista7Dias);
       setMaxValor(Math.max(...lista7Dias.map(d => d.valor), 1000));
 
@@ -97,6 +136,22 @@ function VisaoGeral({ periodo }) {
 
   return (
     <>
+      {itensBaixoEstoque.length > 0 && (
+        <div className="alerta-estoque-topo">
+          <div className="alerta-estoque-header">
+            <span className="alerta-estoque-icone">⚠️</span>
+            <strong>Alerta de Reposição: Saldo de Estoque Crítico!</strong>
+          </div>
+          <div className="alerta-estoque-corpo">
+            {itensBaixoEstoque.map((item, idx) => (
+              <span key={idx} className="alerta-estoque-tag">
+                {item.item}: Restam apenas <strong>{item.quantidade} {item.unidade}</strong>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="cards-grid">
         <div className="card">
           <div className="card-icon verde">💰</div>
@@ -114,7 +169,6 @@ function VisaoGeral({ periodo }) {
           <span className="card-sub">Saídas de caixa</span>
         </div>
 
-        {/* CARD DE FLUXO COM A VOLTA DAS ETIQUETAS */}
         <div className="card">
           <div className="card-icon azul">👥</div>
           <span className="card-label">Fluxo de Pessoas</span>
@@ -137,7 +191,7 @@ function VisaoGeral({ periodo }) {
         <div className="grafico-card">
           <div className="grafico-header">
             <strong>Faturamento Semanal</strong>
-            <p>Tendência dos últimos 7 dias</p>
+            <p>Janela de dados da semana atual corporativa</p>
           </div>
           <div className="barras">
             {dadosGrafico.map((item, idx) => (
@@ -158,13 +212,24 @@ function VisaoGeral({ periodo }) {
             </div>
             <div className="barra-prog"><div className="barra-fill verde" style={{ width: `${Math.min(metricas.contagemVendas * 10, 100)}%` }} /></div>
           </div>
+          
+          {/* CORREÇÃO: Barra de progresso vinculada ao saldo real acumulado de peixe */}
           <div className="resumo-item">
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#888' }}>
               <span>Estoque de Peixe</span><span>{metricas.kgPeixe}kg</span>
             </div>
-            <div className="barra-prog"><div className="barra-fill vermelho" style={{ width: `${Math.min(metricas.kgPeixe, 100)}%` }} /></div>
+            <div className="barra-prog">
+              <div className="barra-fill vermelho" style={{ width: `${Math.min(metricas.kgPeixe, 100)}%` }} />
+            </div>
           </div>
           <strong className="resumo-titulo" style={{ marginTop: '20px' }}>Avisos</strong>
+          
+          {itensBaixoEstoque.length > 0 && (
+            <div className="aviso aviso-vermelho-pisca">
+              Atenção: {itensBaixoEstoque.length} produtos em nível crítico!
+            </div>
+          )}
+
           {metricas.expectativaHoje > 0 && (
             <div className="aviso aviso-amarelo">Expectativa de {metricas.expectativaHoje} pessoas hoje</div>
           )}
@@ -175,11 +240,44 @@ function VisaoGeral({ periodo }) {
   );
 }
 
-// ---- COMPONENTE PRINCIPAL ----
 function Dashboard() {
   const [menuAtivo, setMenuAtivo] = useState('Visão Geral');
   const [periodo, setPeriodo] = useState('Semana');
+  const [itensBaixoEstoque, setItensBaixoEstoque] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const verificarSaldosCriticos = async () => {
+      try {
+        const { data } = await supabase.from('estoque').select('*');
+        if (data) {
+          const saldos = {};
+          
+          data.forEach((mov) => {
+            const nomeItem = mov.item.toLowerCase().trim();
+            const qtd = Number(mov.quantidade) || 0;
+            const tipo = mov.tipo_movimentacao.toLowerCase().trim();
+
+            if (!saldos[nomeItem]) {
+              saldos[nomeItem] = { item: mov.item, quantity: 0, unidade: mov.unidade || 'unid.' };
+            }
+
+            if (tipo === 'entrada') saldos[nomeItem].quantity += qtd;
+            if (tipo === 'saída' || tipo === 'saida') saldos[nomeItem].quantity -= qtd;
+          });
+
+          const criticos = Object.values(saldos).filter(prod => prod.quantity <= 5);
+          setItensBaixoEstoque(criticos);
+        }
+      } catch (err) {
+        console.error('Erro ao checar estoque crítico:', err);
+      }
+    };
+
+    verificarSaldosCriticos();
+    const intervalo = setInterval(verificarSaldosCriticos, 30000);
+    return () => clearInterval(intervalo);
+  }, [menuAtivo]);
 
   return (
     <div className="dashboard-layout">
@@ -187,12 +285,22 @@ function Dashboard() {
         <div className="sidebar-logo"><LogoPeixe /><span>Rei da Pesca</span></div>
         <nav className="sidebar-nav">
           {['Visão Geral', 'Vendas', 'Gastos', 'Reservas de evento', 'Estoque Alimentício'].map(m => (
-            <button key={m} className={`nav-item ${menuAtivo === m ? 'ativo' : ''}`} onClick={() => setMenuAtivo(m)}>{m}</button>
+            <button 
+              key={m} 
+              className={`nav-item ${menuAtivo === m ? 'ativo' : ''}`} 
+              onClick={() => setMenuAtivo(m)}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+            >
+              <span>{m}</span>
+              {m === 'Estoque Alimentício' && itensBaixoEstoque.length > 0 && (
+                <span className="sidebar-badge-alerta">{itensBaixoEstoque.length}</span>
+              )}
+            </button>
           ))}
           
           <hr style={{ border: '0', borderTop: '1px solid #3d3d3d', margin: '15px 0' }} />
           <button className="nav-item" onClick={() => navigate('/')} style={{ color: '#888', fontSize: '0.85rem' }}>
-             🏠 Voltar ao Site Público
+              🏠 Voltar ao Site Público
           </button>
         </nav>
         <button className="sair-btn" onClick={() => navigate('/login')}>Sair</button>
@@ -205,7 +313,7 @@ function Dashboard() {
               onClick={() => navigate('/')} 
               style={{ background: 'none', border: 'none', color: '#2d6a2d', cursor: 'pointer', fontSize: '0.85rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold' }}
             >
-              ← Voltar ao Site
+               ← Voltar ao Site
             </button>
             <h1>{menuAtivo === 'Visão Geral' ? 'Painel de Gestão' : menuAtivo}</h1>
             <p>Controle de dados: <strong>{periodo}</strong></p>
@@ -230,7 +338,7 @@ function Dashboard() {
           {menuAtivo === 'Gastos' && <Gastos />}
           {menuAtivo === 'Reservas de evento' && <ReservasEvento />}
           {menuAtivo === 'Estoque Alimentício' && <EstoqueAlimenticio />}
-          {menuAtivo === 'Visão Geral' && <VisaoGeral periodo={periodo} />}
+          {menuAtivo === 'Visão Geral' && <VisaoGeral periodo={periodo} itensBaixoEstoque={itensBaixoEstoque} />}
         </div>
       </main>
     </div>
