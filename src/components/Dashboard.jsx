@@ -6,6 +6,7 @@ import Gastos from './Gastos';
 import EstoqueAlimenticio from './EstoqueAlimenticio';
 import GestaoReservas from './GestaoReservas';
 import ReservasEvento from './ReservasEvento';
+import Relatorios from './Relatorios';
 import { supabase } from '../services/supabase';
 
 function LogoPeixe() {
@@ -19,7 +20,7 @@ function LogoPeixe() {
 }
 
 // ---- COMPONENTE: VISÃO GERAL ----
-function VisaoGeral({ periodo, itensBaixoEstoque }) {
+function VisaoGeral({ periodo, itensBaixoEstoque, reservasPendentesAlerta }) {
   const [metricas, setMetricas] = useState({
     lucro: 0, gastos: 0, fluxoReal: 0, expectativaHoje: 0, reservasPendentes: 0, contagemVendas: 0, kgPeixe: 0
   });
@@ -29,7 +30,7 @@ function VisaoGeral({ periodo, itensBaixoEstoque }) {
 
   useEffect(() => {
     buscarDadosDashboard();
-  }, [periodo, itensBaixoEstoque]);
+  }, [periodo, itensBaixoEstoque, reservasPendentesAlerta]);
 
   const buscarDadosDashboard = async () => {
     setCarregando(true);
@@ -67,7 +68,7 @@ function VisaoGeral({ periodo, itensBaixoEstoque }) {
         gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto === hoje);
         estoqueFiltrado = estoqueFiltrado.filter(e => e.data_movimentacao === hoje);
       } else if (periodo === 'Semana') {
-        vendasFiltradas = vendasFiltradas.filter(v => v.data_venda >= dataInicioSemana && v.data_venda <= today);
+        vendasFiltradas = vendasFiltradas.filter(v => v.data_venda >= dataInicioSemana && v.data_venda <= hoje);
         gastosFiltrados = gastosFiltrados.filter(g => g.data_gasto >= dataInicioSemana && g.data_gasto <= hoje);
         estoqueFiltrado = estoqueFiltrado.filter(e => e.data_movimentacao >= dataInicioSemana && e.data_movimentacao <= hoje);
       } else if (periodo === 'Mês') {
@@ -136,6 +137,15 @@ function VisaoGeral({ periodo, itensBaixoEstoque }) {
 
   return (
     <>
+      {reservasPendentesAlerta > 0 && (
+        <div className="alerta-estoque-topo" style={{ backgroundColor: '#fff3cd', color: '#856404', borderColor: '#ffeeba', marginBottom: '15px' }}>
+          <div className="alerta-estoque-header">
+            <span className="alerta-estoque-icone">⚠️</span>
+            <strong>Atenção: Você tem {reservasPendentesAlerta} reservas aguardando confirmação!</strong>
+          </div>
+        </div>
+      )}
+
       {itensBaixoEstoque.length > 0 && (
         <div className="alerta-estoque-topo">
           <div className="alerta-estoque-header">
@@ -244,6 +254,7 @@ function Dashboard() {
   const [menuAtivo, setMenuAtivo] = useState('Visão Geral');
   const [periodo, setPeriodo] = useState('Semana');
   const [itensBaixoEstoque, setItensBaixoEstoque] = useState([]);
+  const [reservasPendentesAlerta, setReservasPendentesAlerta] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -269,8 +280,14 @@ function Dashboard() {
           const criticos = Object.values(saldos).filter(prod => prod.quantity <= 5);
           setItensBaixoEstoque(criticos);
         }
+
+        const { count: pendentes } = await supabase.from('reservas')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'Pendente');
+        
+        setReservasPendentesAlerta(pendentes || 0);
       } catch (err) {
-        console.error('Erro ao checar estoque crítico:', err);
+        console.error('Erro ao checar estoque crítico ou reservas:', err);
       }
     };
 
@@ -284,7 +301,7 @@ function Dashboard() {
       <aside className="sidebar">
         <div className="sidebar-logo"><LogoPeixe /><span>Rei da Pesca</span></div>
         <nav className="sidebar-nav">
-          {['Visão Geral', 'Vendas', 'Gastos', 'Reservas de evento', 'Estoque Alimentício'].map(m => (
+          {['Visão Geral', 'Vendas', 'Gastos', 'Reservas de evento', 'Estoque Alimentício', 'Relatórios'].map(m => (
             <button 
               key={m} 
               className={`nav-item ${menuAtivo === m ? 'ativo' : ''}`} 
@@ -294,6 +311,9 @@ function Dashboard() {
               <span>{m}</span>
               {m === 'Estoque Alimentício' && itensBaixoEstoque.length > 0 && (
                 <span className="sidebar-badge-alerta">{itensBaixoEstoque.length}</span>
+              )}
+              {m === 'Reservas de evento' && reservasPendentesAlerta > 0 && (
+                <span className="sidebar-badge-alerta">{reservasPendentesAlerta}</span>
               )}
             </button>
           ))}
@@ -338,7 +358,8 @@ function Dashboard() {
           {menuAtivo === 'Gastos' && <Gastos />}
           {menuAtivo === 'Reservas de evento' && <ReservasEvento />}
           {menuAtivo === 'Estoque Alimentício' && <EstoqueAlimenticio />}
-          {menuAtivo === 'Visão Geral' && <VisaoGeral periodo={periodo} itensBaixoEstoque={itensBaixoEstoque} />}
+          {menuAtivo === 'Relatórios' && <Relatorios />}
+          {menuAtivo === 'Visão Geral' && <VisaoGeral periodo={periodo} itensBaixoEstoque={itensBaixoEstoque} reservasPendentesAlerta={reservasPendentesAlerta} />}
         </div>
       </main>
     </div>
